@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
+from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QTableWidgetItem
 from PyQt5.uic import loadUi
 from dotenv import load_dotenv
 import os
@@ -30,8 +30,10 @@ class MainWindow(QDialog):
         self.isInvested = False
         self.buyTolerance = 1
         self.sellTolerance = 1
+        self.actionCount = 0
 
         loadUi("StockGUI.ui", self)
+        self.initTable()
 
         # Connections to callback functions
         self.exitButton.clicked.connect(self.kill)
@@ -47,14 +49,16 @@ class MainWindow(QDialog):
         Showing current price, money, action and resulting money"""
 
         roundMoney = round(self.money, 2)
-        roundBuy = round(self.money + price, 2)
-        roundSell = round(self.money - price, 2)
+        roundSell = round(self.money + price, 2)
+        roundBuy = round(self.money - price, 2)
         logMsg = ""
 
         if buysell == "S":
-            logMsg = f"{roundMoney} now.Sold at ${price} => {roundBuy}"
+            logMsg = f"{roundMoney} now.Sold at ${price} => {roundSell}"
+            self.addRow(roundMoney, "Sell", price, roundSell)
         else:
-            logMsg = f"{roundMoney} now. Bought at ${price} => {roundSell}"
+            logMsg = f"{roundMoney} now. Bought at ${price} => {roundBuy}"
+            self.addRow(roundMoney, "Buy", price, roundBuy)
 
         self.log.append(logMsg)
 
@@ -118,11 +122,30 @@ class MainWindow(QDialog):
         for entry in self.log:
             print(entry)
 
+        figs = list(map(plt.figure, plt.get_fignums()))
+
+        figs[0].canvas.manager.window.move(-1800, 300)
+
         plt.show()
+
+    def initTable(self):
+        t = self.actionLog
+        t.setRowCount(2)
+        t.setColumnCount(4)
+
+        columnLabels = ["Previous $", "Action", "Stock $", "Current $"]
+        t.setHorizontalHeaderLabels(columnLabels)
+        # t.setItem(0, 0, QTableWidgetItem(str(3)))
+
+    def addRow(self, prevPrice, action, stockPrice, currentPrice):
+        self.actionLog.insertRow(self.actionCount)
+        for idx, entry in enumerate([prevPrice, action, stockPrice, currentPrice]):
+            self.actionLog.setItem(self.actionCount, idx, QTableWidgetItem(str(entry)))
+
+        self.actionCount += 1
 
     def kill(self):
         """Exit the Interface"""
-        print(ALPHA_KEY)
         sys.exit(0)
 
 
