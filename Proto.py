@@ -10,7 +10,9 @@ from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.techindicators import TechIndicators
 import matplotlib.pyplot as plt
 import numpy as np
+import pyqtgraph as pg
 
+uiclass, baseclass = pg.Qt.loadUiType("StockGUI.ui")
 
 # ? MessageBox format CTYPES for popup windows
 # ctypes.windll.user32.MessageBoxW(0, "Your text", "Your title", 1)
@@ -24,7 +26,6 @@ class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.show()
         # Attributes
         self.ticker = "TSLA"  # Ticker symbol
         self.money = 0
@@ -39,6 +40,12 @@ class MainWindow(QDialog):
         self.exitButton.clicked.connect(self.kill)
         self.GetStockDataButton.clicked.connect(self.evaluateStrategy)
         self.tickerEdit.textChanged.connect(self.updateTicker)
+        self.plot(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [30, 32, 34, 32, 33, 31, 29, 32, 35, 45]
+        )
+
+    def plot(self, hour, temperature):
+        self.graphWidget.plot(hour, temperature)
 
     def updateTicker(self):
         """Updates ticker symbol from GUI input box"""
