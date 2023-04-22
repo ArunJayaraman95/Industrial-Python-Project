@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
+from PyQt5.QtWidgets import QDialog, QApplication, QWidget, QFileDialog
 from PyQt5.uic import loadUi
 from dotenv import load_dotenv
 import os
@@ -10,6 +10,7 @@ from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.techindicators import TechIndicators
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 # ? MessageBox format CTYPES for popup windows
 # ctypes.windll.user32.MessageBoxW(0, "Your text", "Your title", 1)
@@ -23,6 +24,7 @@ class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        self.show()
         # Attributes
         self.ticker = "TSLA"  # Ticker symbol
         self.money = 0
