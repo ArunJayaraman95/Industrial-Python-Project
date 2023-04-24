@@ -10,6 +10,7 @@ from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.techindicators import TechIndicators
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
 
 # ? MessageBox format CTYPES for popup windows
 # ctypes.windll.user32.MessageBoxW(0, "Your text", "Your title", 1)
@@ -17,6 +18,8 @@ import numpy as np
 # Get environment variable to get API key
 load_dotenv()
 ALPHA_KEY = os.getenv("ALPHA_KEY")
+
+logging.basicConfig(level=logging.INFO)
 
 
 class MainWindow(QDialog):
@@ -41,10 +44,6 @@ class MainWindow(QDialog):
         self.GetStockDataButton.clicked.connect(self.evaluateStrategy)
         self.tickerEdit.textChanged.connect(self.updateTicker)
 
-    def updateTicker(self):
-        """Updates ticker symbol from GUI input box"""
-        self.ticker = self.tickerEdit.text()
-
     def logActions(self, price, buysell):
         """Log a buy/sell action to the log.
         Showing current price, money, action and resulting money"""
@@ -65,6 +64,7 @@ class MainWindow(QDialog):
         self.log.append(logMsg)
 
     def updateValues(self):
+        self.ticker = self.tickerEdit.text().upper()
         if self.buyToleranceEdit.text() == "":
             self.buyTolerance = 0
         else:
@@ -78,18 +78,40 @@ class MainWindow(QDialog):
         if self.trailStopEdit.text() != "":
             self.trail = float(self.trailStopEdit.text())
 
+    def reset(self):
+        # Clear/Delete graph
+        plt.clf()
+        plt.cla()
+        plt.close()
+        # Reset table
+        self.actionLog.setRowCount(0)
+
+        # Reset values to defaults
+        self.money = 0
+        self.log = []
+        self.isInvested = False
+        self.buyTolerance = 0
+        self.sellTolerance = 0
+        self.actionCount = 0
+        self.trail = 0
+
     def evaluateStrategy(self):
         """Gets stock data and runs
         through data to evaluate trading strategy."""
-        plt.clf()
 
+        self.reset()
         self.updateValues()
 
-        print(self.buyTolerance, "xxx", self.sellTolerance)
+        # print(self.buyTolerance, "xxx", self.sellTolerance)s
+        logging.info(f"{self.buyTolerance} + {self.sellTolerance}")
 
         # Get weekly timeseries data for given stock and put into pandas dataframe
         ts = TimeSeries(key=ALPHA_KEY, output_format="pandas")
-        data_ts, meta_data_ts = ts.get_weekly(symbol=self.ticker)
+        try:
+            data_ts, meta_data_ts = ts.get_weekly(symbol=self.ticker)
+        except:
+            ctypes.windll.user32.MessageBoxW(0, "Invalid Ticker", "ERROR", 1)
+            sys.exit(0)
         data_otn = data_ts.iloc[::-1]  # Reverse to order from old to recent
 
         data = data_otn["4. close"].to_frame()  # Isolate to closing column
@@ -147,9 +169,7 @@ class MainWindow(QDialog):
 
         figs[0].canvas.manager.window.move(-1800, 300)
 
-        
         plt.show()
-        plt.clf()
 
     def initTable(self):
         t = self.actionLog
@@ -169,6 +189,11 @@ class MainWindow(QDialog):
 
     def kill(self):
         """Exit the Interface"""
+        # Close graph
+        plt.clf()
+        plt.cla()
+        plt.close()
+
         sys.exit(0)
 
 
