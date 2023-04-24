@@ -35,6 +35,7 @@ class MainWindow(QDialog):
         self.sellTolerance = 0
         self.actionCount = 0
         self.trail = 0
+        self.tickerList = []
 
         loadUi("StockGUI.ui", self)
         self.initTable()
@@ -42,7 +43,7 @@ class MainWindow(QDialog):
         # Connections to callback functions
         self.exitButton.clicked.connect(self.kill)
         self.GetStockDataButton.clicked.connect(self.evaluateStrategy)
-        self.tickerEdit.textChanged.connect(self.updateTicker)
+        self.tickerEdit.textChanged.connect(self.updateValues)
 
     def logActions(self, price, buysell):
         """Log a buy/sell action to the log.
@@ -62,6 +63,12 @@ class MainWindow(QDialog):
             self.addRow(roundMoney, "Buy", price, roundBuy)
 
         self.log.append(logMsg)
+
+    def readTickerFile(self):
+        with open("tickers.txt", "r") as file:
+            for line in file:
+                self.tickerList.append(line.strip())
+                logging.info(line.strip())
 
     def updateValues(self):
         self.ticker = self.tickerEdit.text().upper()
@@ -94,6 +101,7 @@ class MainWindow(QDialog):
         self.sellTolerance = 0
         self.actionCount = 0
         self.trail = 0
+        self.readTickerFile()
 
     def evaluateStrategy(self):
         """Gets stock data and runs
