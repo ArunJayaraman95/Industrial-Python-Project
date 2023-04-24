@@ -28,9 +28,10 @@ class MainWindow(QDialog):
         self.money = 0
         self.log = []
         self.isInvested = False
-        self.buyTolerance = 1
-        self.sellTolerance = 1
+        self.buyTolerance = 0
+        self.sellTolerance = 0
         self.actionCount = 0
+        self.trail = 0
 
         loadUi("StockGUI.ui", self)
         self.initTable()
@@ -48,23 +49,43 @@ class MainWindow(QDialog):
         """Log a buy/sell action to the log.
         Showing current price, money, action and resulting money"""
 
-        roundMoney = round(self.money, 2)
-        roundSell = round(self.money + price, 2)
-        roundBuy = round(self.money - price, 2)
+        roundMoney = f"${round(self.money, 2)}"
+        roundSell = f"${round(self.money + price, 2)}"
+        roundBuy = f"${round(self.money - price, 2)}"
+        price = f"${price}"
         logMsg = ""
 
         if buysell == "S":
-            logMsg = f"{roundMoney} now.Sold at ${price} => {roundSell}"
+            logMsg = f"{roundMoney} now.Sold at {price} => {roundSell}"
             self.addRow(roundMoney, "Sell", price, roundSell)
         else:
-            logMsg = f"{roundMoney} now. Bought at ${price} => {roundBuy}"
+            logMsg = f"{roundMoney} now. Bought at {price} => {roundBuy}"
             self.addRow(roundMoney, "Buy", price, roundBuy)
 
         self.log.append(logMsg)
 
+    def updateValues(self):
+        if self.buyToleranceEdit.text() == "":
+            self.buyTolerance = 0
+        else:
+            self.buyTolerance = float(self.buyToleranceEdit.text())
+
+        if self.sellToleranceEdit.text() == "":
+            self.sellTolerance = 0
+        else:
+            self.sellTolerance = float(self.sellToleranceEdit.text())
+
+        if self.trailStopEdit.text() != "":
+            self.trail = float(self.trailStopEdit.text())
+
     def evaluateStrategy(self):
         """Gets stock data and runs
         through data to evaluate trading strategy."""
+        plt.clf()
+
+        self.updateValues()
+
+        print(self.buyTolerance, "xxx", self.sellTolerance)
 
         # Get weekly timeseries data for given stock and put into pandas dataframe
         ts = TimeSeries(key=ALPHA_KEY, output_format="pandas")
@@ -89,8 +110,8 @@ class MainWindow(QDialog):
             underSMA = currentPrice < currentSMA
             overSMA = currentPrice > currentSMA
 
-            underBuyTolerance = currentPrice <= self.buyTolerance * currentSMA
-            overSellTolerance = currentPrice >= self.sellTolerance * currentSMA
+            underBuyTolerance = currentPrice <= (1 - self.buyTolerance) * currentSMA
+            overSellTolerance = currentPrice >= (1 + self.sellTolerance) * currentSMA
 
             if underSMA and underBuyTolerance and not self.isInvested:
                 plt.plot(
@@ -119,18 +140,20 @@ class MainWindow(QDialog):
                 self.money += currentPrice
 
         # Print log to console
-        for entry in self.log:
-            print(entry)
+        # for entry in self.log:
+        #     print(entry)
 
         figs = list(map(plt.figure, plt.get_fignums()))
 
         figs[0].canvas.manager.window.move(-1800, 300)
 
+        
         plt.show()
+        plt.clf()
 
     def initTable(self):
         t = self.actionLog
-        t.setRowCount(2)
+        t.setRowCount(0)
         t.setColumnCount(4)
 
         columnLabels = ["Previous $", "Action", "Stock $", "Current $"]
