@@ -19,7 +19,7 @@ import logging
 load_dotenv()
 ALPHA_KEY = os.getenv("ALPHA_KEY")
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 
 class MainWindow(QDialog):
@@ -85,7 +85,7 @@ class MainWindow(QDialog):
             self.sellTolerance = float(self.sellToleranceEdit.text()) / 100
 
         if self.stopLossEdit.text() != "":
-            self.stopLoss = float(self.trailStopEdit.text()) / 100
+            self.stopLoss = float(self.stopLossEdit.text()) / 100
 
     def reset(self):
         # Clear/Delete graph
@@ -103,18 +103,11 @@ class MainWindow(QDialog):
         self.sellTolerance = 0
         self.actionCount = 0
         self.stopLoss = 0
+        self.lastBuy = 0
+        self.cutLosses = False
         self.readTickerFile()
 
-    def evaluateStrategy(self):
-        """Gets stock data and runs
-        through data to evaluate trading strategy."""
-
-        self.reset()
-        self.updateValues()
-
-        # print(self.buyTolerance, "xxx", self.sellTolerance)s
-        logging.info(f"{self.buyTolerance} + {self.sellTolerance}")
-
+    def SMA(self):
         # Get weekly timeseries data for given stock and put into pandas dataframe
         ts = TimeSeries(key=ALPHA_KEY, output_format="pandas")
         try:
@@ -186,7 +179,6 @@ class MainWindow(QDialog):
 
             # Stop Loss Check
             if self.isInvested and self.stopLoss != 0:
-                print("YE")
                 if currentPrice <= self.lastBuy * (1 - self.stopLoss):
                     sell()
                     self.cutLosses = True
@@ -200,6 +192,22 @@ class MainWindow(QDialog):
         figs[0].canvas.manager.window.move(-1800, 300)
 
         plt.show()
+
+    def evaluateStrategy(self):
+        """Gets stock data and runs
+        through data to evaluate trading strategy."""
+
+        self.reset()
+        self.updateValues()
+
+        # print(self.buyTolerance, "xxx", self.sellTolerance)s
+        logging.info(f"{self.buyTolerance} + {self.sellTolerance}")
+        if self.strat1.isChecked():
+            self.SMA()
+        if self.strat2.isChecked():
+            print("CHECKED 2")
+        if self.strat3.isChecked():
+            print("CHECKED 3")
 
     def initTable(self):
         t = self.actionLog
