@@ -34,8 +34,10 @@ class MainWindow(QDialog):
         self.buyTolerance = 0
         self.sellTolerance = 0
         self.actionCount = 0
-        self.trail = 0
+        self.stopLoss = 0
         self.tickerList = []
+        self.lastBuy = 0
+        self.cutLosses = False
 
         loadUi("StockGUI.ui", self)
         self.initTable()
@@ -75,15 +77,15 @@ class MainWindow(QDialog):
         if self.buyToleranceEdit.text() == "":
             self.buyTolerance = 0
         else:
-            self.buyTolerance = float(self.buyToleranceEdit.text())
+            self.buyTolerance = float(self.buyToleranceEdit.text()) / 100
 
         if self.sellToleranceEdit.text() == "":
             self.sellTolerance = 0
         else:
-            self.sellTolerance = float(self.sellToleranceEdit.text())
+            self.sellTolerance = float(self.sellToleranceEdit.text()) / 100
 
-        if self.trailStopEdit.text() != "":
-            self.trail = float(self.trailStopEdit.text())
+        if self.stopLossEdit.text() != "":
+            self.stopLoss = float(self.trailStopEdit.text()) / 100
 
     def reset(self):
         # Clear/Delete graph
@@ -100,7 +102,7 @@ class MainWindow(QDialog):
         self.buyTolerance = 0
         self.sellTolerance = 0
         self.actionCount = 0
-        self.trail = 0
+        self.stopLoss = 0
         self.readTickerFile()
 
     def evaluateStrategy(self):
@@ -132,6 +134,33 @@ class MainWindow(QDialog):
         plt.rcParams["figure.figsize"] = [16, 8]
         plt.plot(data[["4. close", "SMA30"]])
 
+        def buy():
+            plt.plot(
+                [data.index[i]],
+                [currentSMA],
+                marker="$B$",
+                ls="none",
+                ms=10,
+                color="red",
+            )
+            self.isInvested = True
+            self.logActions(currentPrice, "B")
+            self.money -= currentPrice
+            self.lastBuy = currentPrice
+
+        def sell():
+            plt.plot(
+                [data.index[i]],
+                [currentSMA],
+                marker="$S$",
+                ls="none",
+                ms=10,
+                color="lime",
+            )
+            self.isInvested = False
+            self.logActions(currentPrice, "S")
+            self.money += currentPrice
+
         # Loop through and check for buy or sell conditions
         for i in range(len(data["SMA30"])):
             currentPrice = data["4. close"][i]
@@ -143,31 +172,24 @@ class MainWindow(QDialog):
             underBuyTolerance = currentPrice <= (1 - self.buyTolerance) * currentSMA
             overSellTolerance = currentPrice >= (1 + self.sellTolerance) * currentSMA
 
-            if underSMA and underBuyTolerance and not self.isInvested:
-                plt.plot(
-                    [data.index[i]],
-                    [currentSMA],
-                    marker="$B$",
-                    ls="none",
-                    ms=10,
-                    color="red",
-                )
-                self.isInvested = True
-                self.logActions(currentPrice, "B")
-                self.money -= currentPrice
-
+            # Buy check
+            if (
+                underSMA
+                and underBuyTolerance
+                and not self.isInvested
+                and not self.cutLosses
+            ):
+                buy()
+            # Sell check
             elif overSMA and overSellTolerance and self.isInvested:
-                plt.plot(
-                    [data.index[i]],
-                    [currentSMA],
-                    marker="$S$",
-                    ls="none",
-                    ms=10,
-                    color="lime",
-                )
-                self.isInvested = False
-                self.logActions(currentPrice, "S")
-                self.money += currentPrice
+                sell()
+
+            # Stop Loss Check
+            if self.isInvested and self.stopLoss != 0:
+                print("YE")
+                if currentPrice <= self.lastBuy * (1 - self.stopLoss):
+                    sell()
+                    self.cutLosses = True
 
         # Print log to console
         # for entry in self.log:
