@@ -20,7 +20,7 @@ color: rgb(255, 255, 255);</string>
   <widget class="QPushButton" name="GetStockDataButton">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>510</x>
      <y>100</y>
      <width>211</width>
      <height>51</height>
@@ -39,43 +39,43 @@ color: #000;</string>
     <string>Get Stock Data</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton">
+  <widget class="QRadioButton" name="strat1">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>170</y>
+     <x>70</x>
+     <y>180</y>
      <width>91</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Strategy 1</string>
+    <string>SMA</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_2">
+  <widget class="QRadioButton" name="strat2">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>200</y>
+     <x>70</x>
+     <y>220</y>
      <width>95</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Strategy 2</string>
+    <string>EMA</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_3">
+  <widget class="QRadioButton" name="strat3">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>230</y>
+     <x>70</x>
+     <y>260</y>
      <width>95</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Strategy 3</string>
+    <string>MACD</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -103,8 +103,8 @@ color: #000;</string>
   <widget class="QLabel" name="NetMoneyLabel">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>550</y>
+     <x>440</x>
+     <y>210</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -116,8 +116,8 @@ color: #000;</string>
   <widget class="QLabel" name="PercentChangeLabel">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>580</y>
+     <x>440</x>
+     <y>250</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -142,28 +142,6 @@ color: #000;</string>
    </property>
    <property name="text">
     <string>Ticker Sym:</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="evaluateStrategyButton">
-   <property name="geometry">
-    <rect>
-     <x>750</x>
-     <y>470</y>
-     <width>211</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>13</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 170, 127);
-color: #000;</string>
-   </property>
-   <property name="text">
-    <string>Evaluate Strategy</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="tickerEdit">
@@ -195,18 +173,8 @@ color: #000;</string>
   <widget class="QLineEdit" name="stopLossEdit">
    <property name="geometry">
     <rect>
-     <x>850</x>
-     <y>370</y>
-     <width>101</width>
-     <height>31</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="trailStopEdit">
-   <property name="geometry">
-    <rect>
-     <x>850</x>
-     <y>410</y>
+     <x>280</x>
+     <y>250</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -215,8 +183,8 @@ color: #000;</string>
   <widget class="QLabel" name="stopLossLabel">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>370</y>
+     <x>170</x>
+     <y>250</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -225,26 +193,13 @@ color: #000;</string>
     <string>Stop Loss (%):</string>
    </property>
   </widget>
-  <widget class="QLabel" name="trailLabel">
-   <property name="geometry">
-    <rect>
-     <x>750</x>
-     <y>410</y>
-     <width>91</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trail Stop (%):</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="exitButton">
    <property name="geometry">
     <rect>
      <x>840</x>
-     <y>640</y>
-     <width>131</width>
-     <height>41</height>
+     <y>10</y>
+     <width>151</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="font">
@@ -253,7 +208,7 @@ color: #000;</string>
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 67, 76);
+    <string notr="true">background-color: #F00;
 color: rgb(0, 0, 0);</string>
    </property>
    <property name="text">
@@ -263,8 +218,8 @@ color: rgb(0, 0, 0);</string>
   <widget class="QTableWidget" name="actionLog">
    <property name="geometry">
     <rect>
-     <x>112</x>
-     <y>230</y>
+     <x>20</x>
+     <y>320</y>
      <width>506</width>
      <height>351</height>
     </rect>
@@ -282,7 +237,7 @@ color: rgb(0, 0, 0);</string>
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(135, 187, 193);
+    <string notr="true">background-color: #45CB85;
 color: rgb(0, 0, 0);</string>
    </property>
    <property name="lineWidth">
@@ -318,8 +273,8 @@ color: rgb(0, 0, 0);</string>
   <widget class="QLabel" name="buyTollLabel">
    <property name="geometry">
     <rect>
-     <x>740</x>
-     <y>270</y>
+     <x>170</x>
+     <y>170</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -331,8 +286,8 @@ color: rgb(0, 0, 0);</string>
   <widget class="QLineEdit" name="buyToleranceEdit">
    <property name="geometry">
     <rect>
-     <x>850</x>
-     <y>270</y>
+     <x>280</x>
+     <y>170</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -344,8 +299,8 @@ color: rgb(0, 0, 0);</string>
   <widget class="QLabel" name="sellTolLabel">
    <property name="geometry">
     <rect>
-     <x>740</x>
-     <y>310</y>
+     <x>170</x>
+     <y>210</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -357,14 +312,82 @@ color: rgb(0, 0, 0);</string>
   <widget class="QLineEdit" name="sellToleranceEdit">
    <property name="geometry">
     <rect>
-     <x>850</x>
-     <y>310</y>
+     <x>280</x>
+     <y>210</y>
      <width>101</width>
      <height>31</height>
     </rect>
    </property>
    <property name="placeholderText">
     <string>0</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="summaryTable">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>320</y>
+     <width>361</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Sans Unicode</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #F0D3F7;
+color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
+   <property name="gridStyle">
+    <enum>Qt::SolidLine</enum>
+   </property>
+   <property name="rowCount">
+    <number>4</number>
+   </property>
+   <property name="columnCount">
+    <number>4</number>
+   </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>126</number>
+   </attribute>
+   <attribute name="horizontalHeaderMinimumSectionSize">
+    <number>50</number>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
+   <row/>
+   <row/>
+   <row/>
+   <row/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+  </widget>
+  <widget class="QLabel" name="NetMoneyLabel_2">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>170</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Starting with $10,000</string>
    </property>
   </widget>
  </widget>
