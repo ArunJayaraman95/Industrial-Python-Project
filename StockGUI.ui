@@ -196,7 +196,7 @@ color: #000;</string>
    <property name="geometry">
     <rect>
      <x>850</x>
-     <y>320</y>
+     <y>370</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -206,17 +206,17 @@ color: #000;</string>
    <property name="geometry">
     <rect>
      <x>850</x>
-     <y>360</y>
+     <y>410</y>
      <width>101</width>
      <height>31</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_5">
+  <widget class="QLabel" name="stopLossLabel">
    <property name="geometry">
     <rect>
      <x>750</x>
-     <y>320</y>
+     <y>370</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -225,11 +225,11 @@ color: #000;</string>
     <string>Stop Loss (%):</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_6">
+  <widget class="QLabel" name="trailLabel">
    <property name="geometry">
     <rect>
      <x>750</x>
-     <y>360</y>
+     <y>410</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -263,9 +263,9 @@ color: rgb(0, 0, 0);</string>
   <widget class="QTableWidget" name="actionLog">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>112</x>
      <y>230</y>
-     <width>468</width>
+     <width>506</width>
      <height>351</height>
     </rect>
    </property>
@@ -297,6 +297,12 @@ color: rgb(0, 0, 0);</string>
    <property name="columnCount">
     <number>4</number>
    </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>126</number>
+   </attribute>
+   <attribute name="horizontalHeaderMinimumSectionSize">
+    <number>50</number>
+   </attribute>
    <attribute name="verticalHeaderVisible">
     <bool>false</bool>
    </attribute>
@@ -308,6 +314,58 @@ color: rgb(0, 0, 0);</string>
    <column/>
    <column/>
    <column/>
+  </widget>
+  <widget class="QLabel" name="buyTollLabel">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>270</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Buy Tolerance:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="buyToleranceEdit">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>270</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>0</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="sellTolLabel">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>310</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sell Tolerance:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sellToleranceEdit">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>310</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>0</string>
+   </property>
   </widget>
  </widget>
  <resources/>

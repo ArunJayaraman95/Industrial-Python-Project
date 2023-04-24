@@ -1,1 +1,8 @@
 *.env
+AlphaTest.py
+AV Tests.ipynb
+matTest.py
+Untitled.ipynb
+.vscode
+.ipynb_checkpoints
+xx.py
