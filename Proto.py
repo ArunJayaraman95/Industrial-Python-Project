@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import logging
 
+logging.basicConfig(level=logging.INFO)
+
 # ? MessageBox format CTYPES for popup windows
 # ctypes.windll.user32.MessageBoxW(0, "Your text", "Your title", 1)
 
@@ -19,33 +21,65 @@ import logging
 load_dotenv()
 ALPHA_KEY = os.getenv("ALPHA_KEY")
 
-logging.basicConfig(level=logging.WARNING)
+
+STARTER_MONEY = 10_000
 
 
 class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
+        loadUi("StockGUI.ui", self)
 
         # Attributes
         self.ticker = "TSLA"  # Ticker symbol
-        self.money = 0
-        self.log = []
-        self.isInvested = False
-        self.buyTolerance = 0
-        self.sellTolerance = 0
-        self.actionCount = 0
-        self.stopLoss = 0
-        self.tickerList = []
-        self.lastBuy = 0
-        self.cutLosses = False
 
-        loadUi("StockGUI.ui", self)
+        self.reset()
+
         self.initTable()
 
         # Connections to callback functions
         self.exitButton.clicked.connect(self.kill)
         self.GetStockDataButton.clicked.connect(self.evaluateStrategy)
         self.tickerEdit.textChanged.connect(self.updateValues)
+        self.evalMultiple.clicked.connect(self.testMultiple)
+
+    def reset(self):
+        # Clear/Delete graph
+        plt.clf()
+        plt.cla()
+        plt.close()
+        # Reset table
+        self.actionLog.setRowCount(0)
+
+        # Reset values to defaults
+        self.money = STARTER_MONEY
+        self.log = []
+        self.isInvested = False
+        self.buyTolerance = 0
+        self.sellTolerance = 0
+        self.actionCount = 0
+        self.summaryCount = 0
+        self.stopLoss = 0
+        self.lastBuy = 0
+        self.cutLosses = False
+        self.tickerList = []
+
+        self.readTickerFile()
+
+    def initTable(self):
+        t = self.actionLog
+        t.setRowCount(0)
+        t.setColumnCount(4)
+
+        columnLabels = ["Previous $", "Action", "Stock $", "Current $"]
+        t.setHorizontalHeaderLabels(columnLabels)
+        # t.setItem(0, 0, QTableWidgetItem(str(3)))
+
+        s = self.summaryTable
+        s.setRowCount(0)
+        s.setColumnCount(6)
+        columnLabels = ["Ticker", "Strategy", "BuyTol", "SellTol", "StopLoss", "Net $"]
+        s.setHorizontalHeaderLabels(columnLabels)
 
     def logActions(self, price, buysell):
         """Log a buy/sell action to the log.
@@ -87,25 +121,12 @@ class MainWindow(QDialog):
         if self.stopLossEdit.text() != "":
             self.stopLoss = float(self.stopLossEdit.text()) / 100
 
-    def reset(self):
-        # Clear/Delete graph
-        plt.clf()
-        plt.cla()
-        plt.close()
-        # Reset table
-        self.actionLog.setRowCount(0)
-
-        # Reset values to defaults
-        self.money = 0
-        self.log = []
-        self.isInvested = False
-        self.buyTolerance = 0
-        self.sellTolerance = 0
-        self.actionCount = 0
-        self.stopLoss = 0
-        self.lastBuy = 0
-        self.cutLosses = False
-        self.readTickerFile()
+    def testMultiple(self):
+        for ticker in ["GOOG", "FNKO", "DTEA"]:
+            self.reset()
+            self.updateValues()
+            self.ticker = ticker
+            self.SMA()
 
     def SMA(self):
         # Get weekly timeseries data for given stock and put into pandas dataframe
@@ -191,6 +212,110 @@ class MainWindow(QDialog):
 
         figs[0].canvas.manager.window.move(-1800, 300)
 
+        self.addSummary(
+            self.ticker,
+            "SMA",
+            self.buyTolerance,
+            self.sellTolerance,
+            self.stopLoss,
+            self.money - STARTER_MONEY,
+        )
+        plt.legend(["Stock Price", "SMA30"])
+        plt.show()
+
+    def EMA(self):
+        # Get weekly timeseries data for given stock and put into pandas dataframe
+        ts = TimeSeries(key=ALPHA_KEY, output_format="pandas")
+        try:
+            data_ts, meta_data_ts = ts.get_weekly(symbol=self.ticker)
+        except:
+            ctypes.windll.user32.MessageBoxW(0, "Invalid Ticker", "ERROR", 1)
+            sys.exit(0)
+        data_otn = data_ts.iloc[::-1]  # Reverse to order from old to recent
+
+        data = data_otn["4. close"].to_frame()  # Isolate to closing column
+        data["EMA"] = (
+            data["4. close"].ewm(com=0.8).mean()
+        )  # Calculate 30 week moving average
+        data.dropna(inplace=True)  # Remove NA (null) values
+
+        # Parameters for plot
+        plt.rcParams["figure.figsize"] = [16, 8]
+        plt.plot(data[["4. close", "EMA"]])
+
+        def buy():
+            plt.plot(
+                [data.index[i]],
+                [currentSMA],
+                marker="$B$",
+                ls="none",
+                ms=10,
+                color="red",
+            )
+            self.isInvested = True
+            self.logActions(currentPrice, "B")
+            self.money -= currentPrice
+            self.lastBuy = currentPrice
+
+        def sell():
+            plt.plot(
+                [data.index[i]],
+                [currentSMA],
+                marker="$S$",
+                ls="none",
+                ms=10,
+                color="lime",
+            )
+            self.isInvested = False
+            self.logActions(currentPrice, "S")
+            self.money += currentPrice
+
+        # Loop through and check for buy or sell conditions
+        for i in range(len(data["EMA"])):
+            currentPrice = data["4. close"][i]
+            currentSMA = data["EMA"][i]
+
+            underSMA = currentPrice < currentSMA
+            overSMA = currentPrice > currentSMA
+
+            underBuyTolerance = currentPrice <= (1 - self.buyTolerance) * currentSMA
+            overSellTolerance = currentPrice >= (1 + self.sellTolerance) * currentSMA
+
+            # Buy check
+            if (
+                underSMA
+                and underBuyTolerance
+                and not self.isInvested
+                and not self.cutLosses
+            ):
+                buy()
+            # Sell check
+            elif overSMA and overSellTolerance and self.isInvested:
+                sell()
+
+            # Stop Loss Check
+            if self.isInvested and self.stopLoss != 0:
+                if currentPrice <= self.lastBuy * (1 - self.stopLoss):
+                    sell()
+                    self.cutLosses = True
+
+        # Print log to console
+        # for entry in self.log:
+        #     print(entry)
+
+        figs = list(map(plt.figure, plt.get_fignums()))
+
+        figs[0].canvas.manager.window.move(-1800, 300)
+
+        self.addSummary(
+            self.ticker,
+            "EMA",
+            self.buyTolerance,
+            self.sellTolerance,
+            self.stopLoss,
+            self.money - STARTER_MONEY,
+        )
+        plt.legend(["Stock Price", "EMA"])
         plt.show()
 
     def evaluateStrategy(self):
@@ -200,23 +325,14 @@ class MainWindow(QDialog):
         self.reset()
         self.updateValues()
 
-        # print(self.buyTolerance, "xxx", self.sellTolerance)s
         logging.info(f"{self.buyTolerance} + {self.sellTolerance}")
+
         if self.strat1.isChecked():
             self.SMA()
         if self.strat2.isChecked():
-            print("CHECKED 2")
+            self.EMA()
         if self.strat3.isChecked():
             print("CHECKED 3")
-
-    def initTable(self):
-        t = self.actionLog
-        t.setRowCount(0)
-        t.setColumnCount(4)
-
-        columnLabels = ["Previous $", "Action", "Stock $", "Current $"]
-        t.setHorizontalHeaderLabels(columnLabels)
-        # t.setItem(0, 0, QTableWidgetItem(str(3)))
 
     def addRow(self, prevPrice, action, stockPrice, currentPrice):
         self.actionLog.insertRow(self.actionCount)
@@ -224,6 +340,17 @@ class MainWindow(QDialog):
             self.actionLog.setItem(self.actionCount, idx, QTableWidgetItem(str(entry)))
 
         self.actionCount += 1
+
+    def addSummary(self, tick, strat, btol, stol, stoploss, net):
+        net = f"${round(net, 2)}"
+        self.summaryTable.insertRow(self.summaryCount)
+        for idx, entry in enumerate([tick, strat, btol, stol, stoploss, net]):
+            self.summaryTable.setItem(
+                self.summaryCount, idx, QTableWidgetItem(str(entry))
+            )
+        self.NetMoneyLabel.setText(f"Net Money: ${round(self.money, 2)}")
+        percentChange = round(100 * (self.money - STARTER_MONEY) / STARTER_MONEY, 2)
+        self.PercentChangeLabel.setText(f"Percent Change: {percentChange} %")
 
     def kill(self):
         """Exit the Interface"""

@@ -179,6 +179,9 @@ color: #000;</string>
      <height>31</height>
     </rect>
    </property>
+   <property name="placeholderText">
+    <string>0</string>
+   </property>
   </widget>
   <widget class="QLabel" name="stopLossLabel">
    <property name="geometry">
@@ -218,9 +221,9 @@ color: rgb(0, 0, 0);</string>
   <widget class="QTableWidget" name="actionLog">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>320</y>
-     <width>506</width>
+     <width>462</width>
      <height>351</height>
     </rect>
    </property>
@@ -253,7 +256,7 @@ color: rgb(0, 0, 0);</string>
     <number>4</number>
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
-    <number>126</number>
+    <number>115</number>
    </attribute>
    <attribute name="horizontalHeaderMinimumSectionSize">
     <number>50</number>
@@ -325,9 +328,9 @@ color: rgb(0, 0, 0);</string>
   <widget class="QTableWidget" name="summaryTable">
    <property name="geometry">
     <rect>
-     <x>560</x>
+     <x>481</x>
      <y>320</y>
-     <width>361</width>
+     <width>506</width>
      <height>351</height>
     </rect>
    </property>
@@ -353,14 +356,17 @@ color: rgb(0, 0, 0);</string>
    <property name="gridStyle">
     <enum>Qt::SolidLine</enum>
    </property>
+   <property name="sortingEnabled">
+    <bool>true</bool>
+   </property>
    <property name="rowCount">
     <number>4</number>
    </property>
    <property name="columnCount">
-    <number>4</number>
+    <number>6</number>
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
-    <number>126</number>
+    <number>84</number>
    </attribute>
    <attribute name="horizontalHeaderMinimumSectionSize">
     <number>50</number>
@@ -372,6 +378,8 @@ color: rgb(0, 0, 0);</string>
    <row/>
    <row/>
    <row/>
+   <column/>
+   <column/>
    <column/>
    <column/>
    <column/>
@@ -388,6 +396,28 @@ color: rgb(0, 0, 0);</string>
    </property>
    <property name="text">
     <string>Starting with $10,000</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="evalMultiple">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>180</y>
+     <width>211</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(27, 208, 187);
+color: #000;</string>
+   </property>
+   <property name="text">
+    <string>Eval Multiple</string>
    </property>
   </widget>
  </widget>
